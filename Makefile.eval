@@ -1,0 +1,29 @@
+# 
+# Copyright (C) 2015 Rick Bronson (rick AT efn.org)
+# Licensed under the GPL
+#
+# Makefile that get's used for evaluation board library build (under Utilities/STM32_EVAL/STM*_EVAL)
+
+PROJ_NAME=$(shell basename $$PWD | sed -e "s/STM\(.*\)_EVAL/stm\1.a/")
+PROJ_BASE=$(shell basename $$PWD | sed -e "s/STM\(.*\)_EVAL/stm\1/")
+
+# search up in directory tree for  'config.mk'
+TOPDIR ?= $(shell TOPD=$$PWD ; until [ -f config.mk -o "$$TOPD" = "/" ] ; do cd .. ; TOPD=$$PWD ; done ; echo $$TOPD)
+
+# include common definitions (cross toolchain etc.)
+include $(TOPDIR)/config.mk
+
+SRCS = $(wildcard *.c)
+
+OBJS = $(SRCS:.c=.o)
+
+all: 	$(PROJ_NAME)
+
+$(OBJS): %.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(PROJ_BASE).a: $(OBJS)
+	$(AR) -cr lib$@ $(OBJS)
+
+clean:
+	rm -f $(PROJ_NAME) $(OBJS)

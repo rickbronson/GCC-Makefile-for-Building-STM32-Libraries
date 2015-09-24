@@ -1,0 +1,31 @@
+# 
+# Copyright (C) 2015 Rick Bronson (rick AT efn.org)
+# Licensed under the GPL
+#
+# Makefile that get's used for library build (under Libraries)
+
+# search up in directory tree for directory containing sudirectory 'design'
+TOPDIR ?= $(shell TOPD=$$PWD ; until [ -f config.mk -o "$$TOPD" = "/" ] ; do cd .. ; TOPD=$$PWD ; done ; echo $$TOPD)
+
+# include common definitions (cross toolchain etc.)
+include $(TOPDIR)/config.mk
+
+vpath %.c STM32$(STMDIRTYPE)_StdPeriph_Driver/src
+
+# special fixup for F4 memory controller option
+SRCS1 = $(wildcard STM32$(STMDIRTYPE)_StdPeriph_Driver/src/*.c)
+SRCS = $(shell echo $(SRCS1) | sed -e "s/[^ ]*stm32f4xx_fmc.c/ /" -e "s/[^ ]*stm32f4xx_fsmc.c/ /")
+SRCS += $(MEM_CONT) 
+
+OBJS = $(SRCS:.c=.o)
+
+all: lib$(STMLIB).a
+
+%.o : %.c
+	$(CC) $(CFLAGS) -c -o $@ $^
+
+lib$(STMLIB).a: $(OBJS)
+	$(AR) -r $@ $(OBJS)
+
+clean:
+	rm -f $(OBJS) lib$(STMLIB).a

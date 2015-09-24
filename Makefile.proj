@@ -1,0 +1,52 @@
+# 
+# Copyright (C) 2015 Rick Bronson (rick AT efn.org)
+# Licensed under the GPL
+#
+# Makefile that get's used for all projects (under Project*/STM32*_StdPeriph_Examples/)
+
+# all the files will be generated with this name (main.elf, main.bin, main.hex, etc)
+PROJ_NAME=main
+
+# search up in directory tree for  'config.mk'
+TOPDIR ?= $(shell TOPD=$$PWD ; until [ -f config.mk -o "$$TOPD" = "/" ] ; do cd .. ; TOPD=$$PWD ; done ; echo $$TOPD)
+
+# include common definitions (cross toolchain etc.)
+include $(TOPDIR)/config.mk
+
+SRCS = $(wildcard *.c)
+
+STARTSRC = $(TOPDIR)/Libraries/CMSIS/Device/ST/STM32$(STMDIRTYPE)/Source/Templates/TrueSTUDIO/$(STARTUP).s
+
+OBJS = $(SRCS:.c=.o)
+
+all: 	$(STD_PERIPH_LIB)/lib$(STMLIB).a $(PROJ_NAME).elf
+
+$(STD_PERIPH_LIB)/lib$(STMLIB).a:
+	export PROJ_INC=$$PWD; make -C $(STD_PERIPH_LIB); fi
+
+$(EVAL_DIR)/STM$(EVAL)_EVAL/libstm$(EVAL).a:
+	export PROJ_INC=$$PWD; make -C $(EVAL_DIR)/STM$(EVAL)_EVAL; fi
+
+$(STARTUP).o:
+	$(CC) $(CFLAGS) -c -o $@ $(STARTSRC)
+
+$(OBJS): %.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(PROJ_NAME).elf: $(STD_PERIPH_LIB)/lib$(STMLIB).a $(EVAL_DIR)/STM$(EVAL)_EVAL/libstm$(EVAL).a $(OBJS) $(STARTUP).o $(LDFILEDIR)/$(LDFILE)
+	$(CC) $(CFLAGS) $(OBJS) $(STARTUP).o -o $@ -L$(STD_PERIPH_LIB) -L$(EVAL_DIR)/STM$(EVAL)_EVAL -lstm$(EVAL) -L$(LDFILEDIR) -T$(LDFILE) -lstm32$(STMFILETYPE)
+	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
+	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
+	$(OBJDUMP) -St $(PROJ_NAME).elf > $(PROJ_NAME).lst
+	$(SIZE) $(PROJ_NAME).elf
+
+flash: $(PROJ_NAME).bin
+	/opt/stlink/st-flash write main.bin $(FLASH_ADDR)
+
+program: $(PROJ_NAME).bin
+	openocd -f $(OPENOCD_BOARD_DIR)/stm32$(STMFILETYPE).cfg -f $(OPENOCD_PROC_FILE) -c "stm_flash `pwd`/$(PROJ_NAME).bin" -c shutdown
+
+clean:
+	rm -f *.[ao] $(PROJ_NAME).elf $(PROJ_NAME).hex $(PROJ_NAME).bin $(PROJ_NAME).map $(PROJ_NAME).lst
+	make -C $(STD_PERIPH_LIB) clean
+	make -C $(EVAL_DIR)/STM$(EVAL)_EVAL clean
