@@ -24,7 +24,7 @@ cd STM32F0xx_StdPeriph_Lib_V1.5.0
 
 D. Get this set of Makefiles:
 
-git clone https://github.com/rickbronson/GCC-Makefile-For-Building-STM32LIB.git
+git clone https://github.com/rickbronson/GCC-Makefile-for-Building-STM32-Libraries.git
 
 E. Now for the labor intensive part.  You will need to edit the file
 config.mk for all of the items explained at the top of config.mk.
