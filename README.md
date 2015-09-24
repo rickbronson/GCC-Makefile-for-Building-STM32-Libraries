@@ -22,7 +22,7 @@ C. Get the library you want, for instance
 mkdir ~/boards/stm32f030
 cd ~/boards/stm32f030
 wget <where ever>STM32F0xx_StdPeriph_Lib_V1.5.0.zip
-untar STM32F0xx_StdPeriph_Lib_V1.5.0.zip
+unzip STM32F0xx_StdPeriph_Lib_V1.5.0.zip
 cd STM32F0xx_StdPeriph_Lib_V1.5.0
 ```
 
