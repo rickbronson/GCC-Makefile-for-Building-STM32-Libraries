@@ -12,53 +12,68 @@ A. Get a toolchain from https://launchpad.net/gcc-arm-embedded
 
 B. Prepare your box
 
+```
 sudo apt-get install build-essential gdb manpages-dev
+```
 
 C. Get the library you want, for instance
 
+```
 mkdir ~/boards/stm32f030
 cd ~/boards/stm32f030
 wget <where ever>STM32F0xx_StdPeriph_Lib_V1.5.0.zip
 untar STM32F0xx_StdPeriph_Lib_V1.5.0.zip
 cd STM32F0xx_StdPeriph_Lib_V1.5.0
+```
 
 D. Get this set of Makefiles:
 
+```
 git clone https://github.com/rickbronson/GCC-Makefile-for-Building-STM32-Libraries.git
+```
 
 E. Now for the labor intensive part.  You will need to edit the file
 config.mk for all of the items explained at the top of config.mk.
 There are some canned defines at the end of this file that you can
 start with.
 
-F. Decide if you want to tweak the load scripts so remove the sections
+F. Decide if you want to tweak the load scripts to remove the sections
 .preinit_array .init_array .fini_array that seem to add some amount to
 the flash image.  Choose this if you have a 16K flash part and are
 using printf or any of the larger projects.
 
+```
 make fixuplinker
+```
 
 G. Rebuild the world
 
+```
 make
+```
 
 H. Build just the project you are interested in (for example):
 
+```
 cd Projects/STM32F0xx_StdPeriph_Examples/USART/USART_Printf
 make
+```
 
 I. If you want to use libc's version of printf instead of the tiny
 printf, just do (for example)
 
+```
 cd ~/boards/stm32f030/STM32F0xx_StdPeriph_Lib_V1.5.0
 make notinyprintf
 cd Projects/STM32F0xx_StdPeriph_Examples/USART/USART_Printf
 make clean; make
+```
 
 J. Results
 
   The following is the result of several builds:
 	
+```
 File: STM32L1xx_StdPeriph_Lib_V1.3.1.zip
 Project build pass ratio (main.elf/main.c): 69/84
 Build config:
@@ -156,3 +171,4 @@ STARTUP = startup_stm32f427_437xx
 CORE = cortex-m4
 ARCH = armv7e-m
 MEM_CONT = stm32f4xx_fmc.c
+```
