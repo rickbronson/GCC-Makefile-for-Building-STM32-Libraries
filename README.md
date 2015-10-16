@@ -30,6 +30,8 @@ D. Get this set of Makefiles:
 
 ```
 git clone https://github.com/rickbronson/GCC-Makefile-for-Building-STM32-Libraries.git
+mv GCC-Makefile-for-Building-STM32-Libraries/* .
+rmdir GCC-Makefile-for-Building-STM32-Libraries
 ```
 
 E. Now for the labor intensive part.  You will need to edit the file
