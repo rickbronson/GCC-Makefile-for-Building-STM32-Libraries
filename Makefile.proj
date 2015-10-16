@@ -15,7 +15,7 @@ include $(TOPDIR)/config.mk
 
 SRCS = $(wildcard *.c)
 
-STARTSRC = $(TOPDIR)/Libraries/CMSIS/Device/ST/STM32$(STMDIRTYPE)/Source/Templates/TrueSTUDIO/$(STARTUP).s
+STARTSRC = $(TOPDIR)/Libraries/CMSIS/$(STARTUPSUBDIR)/$(STARTUP).s
 
 OBJS = $(SRCS:.c=.o)
 
@@ -40,10 +40,22 @@ $(PROJ_NAME).elf: $(STD_PERIPH_LIB)/lib$(STMLIB).a $(EVAL_DIR)/STM$(EVAL)_EVAL/l
 	$(OBJDUMP) -St $(PROJ_NAME).elf > $(PROJ_NAME).lst
 	$(SIZE) $(PROJ_NAME).elf
 
-flash: $(PROJ_NAME).bin
+flash: $(PROJ_NAME).elf
 	/opt/stlink/st-flash write main.bin $(FLASH_ADDR)
 
-program: $(PROJ_NAME).bin
+gdbwrite: all
+	@echo '################################################'
+	@echo '##### Use me after running "sudo st-util". #####'
+	@echo '################################################'
+	$(GDB) -x gdbwrite.boot $(PROJ_NAME).elf
+
+gdbattach: all
+	@echo '################################################'
+	@echo '##### Use me after running "sudo st-util". #####'
+	@echo '################################################'
+	$(GDB) -x gdbattach.boot $(PROJ_NAME).elf
+
+program: $(PROJ_NAME).elf
 	openocd -f $(OPENOCD_BOARD_DIR)/stm32$(STMFILETYPE).cfg -f $(OPENOCD_PROC_FILE) -c "stm_flash `pwd`/$(PROJ_NAME).bin" -c shutdown
 
 clean:
