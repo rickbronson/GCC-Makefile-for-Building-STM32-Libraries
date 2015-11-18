@@ -63,7 +63,7 @@ TEMPLATEDIR=$(shell cd $(TOPDIR)/$(PROJDIR); find . -maxdepth 1 -name "*StdPerip
 LDFILEDIR=$(TOPDIR)/$(PROJDIR)/$(TEMPLATEDIR)/TrueSTUDIO/$(LDFILESUBDIR)
 
 # try to get flash address from linker file
-FLASH_ADDR ?= $(shell sed -n -e "s/^FLASH.*ORIGIN =\([^,]*\),.*/\1/p" $(LDFILEDIR)/$(LDFILE))
+FLASH_ADDR ?= $(shell sed -n -e "s/^.*FLASH.*ORIGIN *= *\([^,]*\),.*/\1/p" $(LDFILEDIR)/$(LDFILE))
 
 # Location of the Libraries folder from the STM32* Standard Peripheral Library
 STD_PERIPH_LIB=$(TOPDIR)/Libraries
